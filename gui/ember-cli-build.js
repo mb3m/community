@@ -8,7 +8,7 @@ let isDevelopment = EmberApp.env() === 'development';
 module.exports = function(defaults) {
 	let app = new EmberApp(defaults, {
 		fingerprint: {
-			enabled: true,
+			enabled: false,
 			generateAssetMap: true,
 			fingerprintAssetMap: false,
 			prepend: '/',

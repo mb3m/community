@@ -14,7 +14,9 @@ package server
 import (
 	"crypto/tls"
 	"fmt"
+	"io/fs"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/codegangsta/negroni"
@@ -81,6 +83,17 @@ func Start(rt *env.Runtime, s *store.Store, ready chan struct{}) {
 	router.Use(handlers.ProxyHeaders)
 
 	n := negroni.New()
+
+	// priority to local files
+	wd, err := os.Getwd()
+	if err == nil {
+		lfs := os.DirFS(wd)
+		lfs, err = fs.Sub(lfs, "static")
+		if err == nil {
+			httplfs := http.FS(lfs)
+			n.Use(negroni.NewStatic(httplfs))
+		}
+	}
 
 	sfs, err := asset.GetPublicFileSystem(rt.Assets)
 	if err != nil {
